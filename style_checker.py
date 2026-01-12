@@ -1,10 +1,17 @@
 import ast
 
 def show_style_corrected(code):
-    tree = ast.parse(code)
-    return ast.unparse(tree)
+    try:
+        tree = ast.parse(code)
+        clean_code = ast.unparse(tree)
 
-student = "def hello(x,y):unused=1;return x+y"
+        return {
+            "success": True,
+            "corrected_code": clean_code
+        }
 
-corrected = show_style_corrected(student)
-print(corrected)
+    except SyntaxError as e:
+        return {
+            "success": False,
+            "corrected_code": code
+        }

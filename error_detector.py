@@ -4,7 +4,6 @@ class ErrorFinder(ast.NodeVisitor):
     """
     WHAT IT DOES: Walks through code and finds problems
     """
-
     def __init__(self):
         self.errors = []
         self.defined_vars = set()
@@ -29,19 +28,29 @@ class ErrorFinder(ast.NodeVisitor):
         for var in unused:
             self.errors.append({
                 "type": "UnusedVariable",
-                "message": f"Variable '{var}' is never used",
-                "severity": "Warning"
+                "line": "Unknown",
+                "message": f"Variable '{var}' is defined but never used",
+                "suggestion": f"Remove '{var} or use it in your code"
             })
         return self.errors
 
-    def detect_errors(code_string):
-        """Main function you'll call"""
+def detect_errors(code_string):
+    """Main function you'll call"""
+    try:
         tree = ast.parse(code_string)
         finder = ErrorFinder()
-        finder.visit(tree)
-        return finder.find_unused_variables()
 
-def calculate():
-    unused = 100
-    x = 5
-    return x
+        finder.visit(tree)
+
+        errors = finder.find_unused_variables()
+
+        return {
+            "success": True,
+            "errors": errors,
+            "error_count": len(errors)
+        }
+
+    except SyntaxError as e:
+        return {
+            "success": False
+        }
